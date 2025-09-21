@@ -4,7 +4,7 @@ import FileUpload from './components/FileUpload';
 import { useState } from 'react';
 import Header from './components/Header';
 
-const GEMINI_API_KEY ="AIzaSyDQ7xYdAucgoFGN4hxvsDAFd1_Pc1qBVqM";
+const GEMINI_API_KEY ="AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U";
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
