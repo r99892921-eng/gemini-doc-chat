@@ -37,5 +37,6 @@ function App() {
     )}
     <Summary file={selectedFile} apiKey={"AIzaSyDQ7xYdAucgoFGN4hxvsDAFd1_Pc1qBVqM"} />
     <Chat file={selectedFile} apiKey={"AIzaSyDQ7xYdAucgoFGN4hxvsDAFd1_Pc1qBVqM"} />
-  </div>
-)}
+    </div>
+  )}
+  
