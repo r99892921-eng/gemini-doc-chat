@@ -46,8 +46,8 @@ function App() {
           <div style={{ margin: "8px 0 24px 0", color: "#555", fontSize: "18px" }}>
             <b>File:</b> {selectedFile.name}
           </div>
-          <Summary file={selectedFile} apiKey={GEMINI_API_KEY} />
-          <Chat file={selectedFile} apiKey={GEMINI_API_KEY} />
+          <Summary file={selectedFile} apiKey={AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U} />
+          <Chat file={selectedFile} apiKey={AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U} />
         </>
       )}
     </div>

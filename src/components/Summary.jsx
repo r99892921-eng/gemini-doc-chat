@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-function Summary({ file, apiKey }) {
+function Summary({ file,  AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U}) {
   const [summary, setSummary] = useState("");
   const [status, setStatus] = useState("idle");
 
@@ -39,7 +39,7 @@ function Summary({ file, apiKey }) {
       }
     }
     fetchSummary();
-  }, [file, apiKey]);
+  }, [file,AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U]);
 
   if (status === "loading") return <p style={{ color: "#3333cc" }}>Summarizing document... Please wait.</p>;
   if (status === "error") return <p style={{ color: "crimson" }}>❗ Error: Unable to summarize file. Please try again.</p>;
