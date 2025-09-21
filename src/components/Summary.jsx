@@ -10,30 +10,19 @@ function Summary({ file,IzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U}) {
     async function fetchSummary() {
       setStatus("loading");
       try {
-        const genAI = new GoogleGenerativeAI();AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U
-        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+      from google import genai
+      from google.genai import types
 
-        // The CORRECT Gemini prompt structure:
-        const geminiPrompt = {
-  contents: [
-    {
-      parts: [
-        {
-          inlineData: {
-            mimeType: file.type,
-            data: file.base64
-          }
-        },
-        {
-          text: "Summarize this document or image in a short, clear paragraph. Respond in plain text."
-        }
-      ]
-    }
-  ]
-};
+      client = genai.Client()
 
-const result = await model.generateContent(geminiPrompt);
-
+      response = client.models.generate_content(
+          model="gemini-2.5-flash",
+          contents="Explain how AI works in a few words",
+          config=types.GenerateContentConfig(
+          thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
+       ),
+     )
+        print(response.text)  
         const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
         setSummary(response);
         setStatus("success");
