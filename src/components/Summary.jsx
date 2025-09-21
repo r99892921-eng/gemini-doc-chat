@@ -14,23 +14,24 @@ function Summary({ file,  AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U}) {
         const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
 
         const geminiPrompt = {
-          contents: [{
-            parts: [
-              {
-                inlineData: {
-                  mimeType: file.type,
-                  data: file.base64,
-                }
-              },
-              {
-                text: "Summarize this document or image in a short, clear paragraph. Respond in plain text."
-              }
-            ]
-          }]
-        };
-
-        const result = await model.generateContent(geminiPrompt);
-        const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+         contents: [
+      {
+        parts: [
+          {
+          inlineData: {
+            mimeType: file.type,
+            data: file.base64
+          }
+        },
+        {
+          text: input // or the summary prompt
+        }
+      ]
+    }
+  ]
+};
+       const result = await model.generateContent(geminiPrompt);
+       const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
         setSummary(response);
         setStatus("success");
       } catch (err) {
