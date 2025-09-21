@@ -8,38 +8,53 @@ const GEMINI_API_KEY ="AIzaSyDQ7xYdAucgoFGN4hxvsDAFd1_Pc1qBVqM";
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
+
   return (
-    <div>
-      <button
-        style={{
-          float: 'right',
-          marginBottom: 10,
-          background: "#eee",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          padding: "4px 12px",
-          cursor: "pointer"
-        }}
-        onClick={() => setSelectedFile(null)}
-      >
-        Upload New File
-      </button>
-      <p>File selected: <b>{selectedFile?.name}</b></p>
-      {selectedFile?.imageUrl ? (
-        <img
-          src={selectedFile.imageUrl}
-          alt="preview"
-          style={{ maxWidth: '300px', margin: '16px 0' }}
-        />
+    <div style={{ maxWidth: 600, margin: "0 auto", padding: 20 }}>
+      <Header />
+      {!selectedFile ? (
+        // Show only the upload when there's no file chosen yet
+        <FileUpload setFile={setSelectedFile} />
       ) : (
-        <div style={{ fontSize: "48px", margin: "16px 0" }}>📄</div>
+        <>
+          <button
+            style={{
+              float: 'right',
+              margin: "10px 0",
+              background: "#4094f7",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "7px 20px",
+              cursor: "pointer",
+              fontWeight: "bold"
+            }}
+            onClick={() => setSelectedFile(null)}
+          >
+            Start Over
+          </button>
+          <div style={{ clear: "both", marginBottom: 16 }}></div>
+          {selectedFile.imageUrl ? (
+            <img
+              src={selectedFile.imageUrl}
+              alt="preview"
+              style={{ maxWidth: '300px', margin: '16px 0', borderRadius: "14px", boxShadow: "0 4px 16px #e3e4fd" }}
+            />
+          ) : (
+            <div style={{ fontSize: "56px", margin: "24px 0" }}>📄</div>
+          )}
+          <div style={{ margin: "8px 0 24px 0", color: "#555", fontSize: "18px" }}>
+            <b>File:</b> {selectedFile.name}
+          </div>
+          <Summary file={selectedFile} apiKey={GEMINI_API_KEY} />
+          <Chat file={selectedFile} apiKey={GEMINI_API_KEY} />
+        </>
       )}
-      <Summary file={selectedFile} apiKey={GEMINI_API_KEY} />
-      <Chat file={selectedFile} apiKey={GEMINI_API_KEY} />
     </div>
   );
 }
 
 export default App;
+
 
 
