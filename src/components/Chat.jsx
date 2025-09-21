@@ -1,79 +1,73 @@
-import { useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import './Chat.css'
+import { useState } from 'react'
 
-function Chat({ file,AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U}) {
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+function Chat({file}) {
+    const genAI = new GoogleGenerativeAI("REPLACE YOUR API KEY");
+    const model = genAI.getGenerativeModel({ model: 'models/gemini-1.5-flash' });
+    const [messages, setMessages] = useState([]);
+    const [input, setInput] = useState("");
 
-  const sendMessage = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-    const userMessage = { role: "user", text: input };
-    setMessages((msgs) => [...msgs, userMessage]);
-    setIsLoading(true);
-    setInput("");
+    async function handleSendMessage(){
+        if(input.length) {
+            let chatMessages = [...messages, {role: "user", text: input}, {role: "loader", text: ""}];
+            setInput("");
+            setMessages(chatMessages);
 
-    try {
-      
+            try {
+                const result = await model.generateContent([
+                  {
+                      inlineData: {
+                          data: file.file,
+                          mimeType: file.type,
+                      },
+                  },
+                  `
+                    Answer this question about the attached document: ${input}.
+                    Answer as a chatbot with short messages and text only (no markdowns, tags or symbols)
+                    Chat history: ${JSON.stringify(messages)}
+                  `,
+                ]);
 
-      const aiText = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-
-      setMessages((msgs) => [
-        ...msgs,
-        { role: "ai", text: aiText }
-      ]);
-    } catch (err) {
-      setMessages((msgs) => [
-        ...msgs,
-        {
-          role: "ai",
-          text: "❗ Error: AI could not answer your question. Try again!"
+                chatMessages = [...chatMessages.filter((msg)=>msg.role != 'loader'), {role: "model", text: result.response.text()}]
+                setMessages(chatMessages);
+              } catch (error) {
+                chatMessages = [...chatMessages.filter((msg)=>msg.role != 'loader'), {role: "error", text: "Error sending messages, please try again later."}]
+                setMessages(chatMessages);
+                console.log('error');
+              }
         }
-      ]);
-      console.error("Gemini chat error:", err);
     }
-    setIsLoading(false);
-  };
 
-  return (
-    <div>
-      <h2>Ask Questions About Your File</h2>
-      <div style={{
-        minHeight: "100px", marginBottom: "12px",
-        border: "1px solid #ccc", padding: "10px"
-      }}>
-        {messages.map((m, i) => (
-          <div key={i}
-            style={{
-              color: m.role === "ai" ? "slateblue" : "black",
-              marginBottom: "8px",
-            }}>
-            <b>{m.role === "ai" ? "Gemini:" : "You:"}</b> {m.text}
-          </div>
-        ))}
-        {isLoading && (<div style={{ color: "#3333cc" }}>Gemini is thinking...</div>)}
-        {messages.length === 0 && !isLoading && (
-          <div style={{ color: "#888" }}>
-            Type a question about your uploaded file above!
-          </div>
-        )}
-      </div>
-      <form onSubmit={sendMessage}>
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a question about your file..."
-          style={{ width: "80%" }}
-          disabled={isLoading}
-        />
-        <button type="submit" disabled={isLoading || !input.trim()} style={{ marginLeft: "8px" }}>
-          Send
-        </button>
-      </form>
-    </div>
-  );
-}
-
-export default Chat;
-
+    return (
+      <section className="chat-window">
+        <h2>Chat</h2>
+        {
+            messages.length ?
+            <div className="chat">
+                {
+                    messages.map((msg)=>(
+                        <div className={msg.role} key={msg.text}>
+                            <p>{msg.text}</p>
+                        </div>
+                    ))
+                }
+            </div> :
+            ''
+        }
+        
+        <div className="input-area">
+            <input 
+                value={input}
+                onChange={(e)=>setInput(e.target.value)}
+                type="text"
+                placeholder="Ask any question about the uploaded document..."
+            />
+            <button onClick={handleSendMessage}>Send</button>
+        </div>
+      </section>
+    )
+  }
+  
+  export default Chat
+  

@@ -1,61 +1,61 @@
-import { useEffect, useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { useState, useEffect } from "react";
+import Loader from './Loader'
 
-// Usage: <Summary docText={theText} apiKey="YOUR_KEY" />
-function Summary({ docText,  AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U}){
-  const [summary, setSummary] = useState("");
+function Summary({file}) {
+
+  const genAI = new GoogleGenerativeAI("REPLACE YOUR API KEY");
+  const model = genAI.getGenerativeModel({ model: 'models/gemini-1.5-flash' });
+  const [summary,setSummary] = useState("");
   const [status, setStatus] = useState("idle");
 
-  useEffect(() => {
-    if (!docText) return;
-    async function fetchSummary() {
-      setStatus("loading");
-      try {
-                        // See https://developers.google.com/apps-script/guides/properties
-// for instructions on how to set the API key.
-const apiKey = PropertiesService.getScriptProperties().getProperty('AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U');
+  async function getSummary(){
+    setStatus('loading');
 
-function main() {
-  const payload = {
-    contents: [
-      {
-        parts: [
-          { text: 'Explain how AI works in a few words' },
-        ],
-      },
-    ],
-  };
-
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-  const options = {
-    method: 'POST',
-    contentType: 'application/json',
-    headers: {
-      'x-goog-api-key':AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U,
-    },
-    payload: JSON.stringify(payload)
-  };
-
-  const response = UrlFetchApp.fetch(url, options);
-  const data = JSON.parse(response);
-  const content = data['candidates'][0]['content']['parts'][0]['text'];
-  console.log(content);
-}
-        const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        setSummary(response);
-        setStatus("success");
-      } catch (err) {
-        setStatus("error");
-        console.error("Gemini summary error:", err);
-      }
+    try {
+      const result = await model.generateContent([
+        {
+            inlineData: {
+                data: file.file,
+                mimeType: file.type,
+            },
+        },
+        `
+          Summarize the document
+          in one short paragraph (less than 100 words).
+          Use just plain text with no markdowns or html tags
+        `,
+      ]);
+      setStatus('success');
+      setSummary(result.response.text());
+    } catch (error) {
+      setStatus('error');
     }
-    fetchSummary();
-  }, [docText,AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U]);
+  }
 
-  if (status === "loading") return <p style={{ color: "#3333cc" }}>Summarizing document... Please wait.</p>;
-  if (status === "error") return <p style={{ color: "crimson" }}>❗ Error: Unable to summarize file. Please try again.</p>;
-  if (status === "success") return <div><h2>Summary</h2><p>{summary}</p></div>;
-  return null;
-}
+  useEffect(()=>{
+    if(status === 'idle'){
+      getSummary();
+    }
+  },[status]);
 
-export default Summary;
+
+    return (
+      <section className="summary">
+
+        <img src={file.imageUrl} alt="Preview Image" />
+        <h2>Summary</h2>
+        {
+          status === 'loading' ?
+          <Loader /> :
+          status === 'success' ?
+          <p>{summary}</p> :
+          status === 'error' ?
+          <p>Error getting the summary</p> :
+          ''
+        }
+      </section>
+    )
+  }
+  
+  export default Summary
