@@ -17,9 +17,9 @@ function FileUpload({ setFile }) {
     }
     const reader = new FileReader();
     reader.onload = function (evt) {
-      const base64String = evt.target.result.split(',')[1];
+      const base64String = evt.target.result.split(",")[1];
       let imageUrl = null;
-      if (file.type.startsWith('image')) {
+      if (file.type.startsWith("image")) {
         imageUrl = URL.createObjectURL(file);
       }
       setFile({
@@ -51,7 +51,7 @@ function FileUpload({ setFile }) {
       <div
         onClick={() => inputRef.current.click()}
         onDrop={handleDrop}
-        onDragOver={e => e.preventDefault()}
+        onDragOver={(e) => e.preventDefault()}
         style={{
           border: "2px dashed #4094f7",
           borderRadius: "16px",
@@ -60,11 +60,13 @@ function FileUpload({ setFile }) {
           background: "#f8faff",
           color: "#123b56",
           cursor: "pointer",
-          transition: "border 0.3s"
+          transition: "border 0.3s",
         }}
       >
-        <p style={{fontSize: "28px", margin: "0 0 10px"}}>📄</p>
-        <div style={{fontWeight: "bold", fontSize: "18px"}}>Click or drag & drop to upload</div>
+        <p style={{ fontSize: "28px", margin: "0 0 10px" }}>📄</p>
+        <div style={{ fontWeight: "bold", fontSize: "18px" }}>
+          Click or drag & drop to upload
+        </div>
         <input
           type="file"
           accept="application/pdf, image/png, image/jpeg, image/jpg"

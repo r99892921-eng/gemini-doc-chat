@@ -15,28 +15,7 @@ function Chat({ file,AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U}) {
     setInput("");
 
     try {
-      const genAI = new GoogleGenerativeAI(AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U);
-      const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
-
-      const geminiPrompt = {
-  contents: [
-    {
-      parts: [
-        {
-          inlineData: {
-            mimeType: file.type,
-            data: file.base64
-          }
-        },
-        {
-          text: "Summarize this document or image in a short, clear paragraph. Respond in plain text."
-        }
-      ]
-    }
-  ]
-};
-
-const result = await model.generateContent(geminiPrompt);
+      
 
       const aiText = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
 
