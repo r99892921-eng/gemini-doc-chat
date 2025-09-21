@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-function Summary({ file,  AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U}) {
+// Accepts `file` and `apiKey` as props
+function Summary({ file,IzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U}) {
   const [summary, setSummary] = useState("");
   const [status, setStatus] = useState("idle");
 
@@ -10,28 +11,30 @@ function Summary({ file,  AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U}) {
     async function fetchSummary() {
       setStatus("loading");
       try {
-        const genAI = new GoogleGenerativeAI(AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U);
+        const genAI = new GoogleGenerativeAI();AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U
         const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
 
+        // The CORRECT Gemini prompt structure:
         const geminiPrompt = {
-         contents: [
-      {
-        parts: [
-          {
-          inlineData: {
-            mimeType: file.type,
-            data: file.base64
-          }
-        },
-        {
-          text: input // or the summary prompt
-        }
-      ]
-    }
-  ]
-};
-       const result = await model.generateContent(geminiPrompt);
-       const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          contents: [
+            {
+              parts: [
+                {
+                  inlineData: {
+                    mimeType: file.type,    // e.g. "image/png"
+                    data: file.base64      // <-- just base64 string, NO prefix
+                  }
+                },
+                {
+                  text: "Summarize this document or image in a short, clear paragraph. Respond in plain text."
+                }
+              ]
+            }
+          ]
+        };
+
+        const result = await model.generateContent(geminiPrompt);
+        const response = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
         setSummary(response);
         setStatus("success");
       } catch (err) {
