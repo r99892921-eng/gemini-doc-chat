@@ -1,29 +1,33 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useState, useEffect } from "react";
-import Loader from './Loader'
+import Loader from './Loader'; // Loader should be a spinner/loading component
 
-function Summary({file}) {
-
-  const genAI = new GoogleGenerativeAI("REPLACE YOUR API KEY");
+function Summary({ file }) {
+  const genAI = new GoogleGenerativeAI("AIzaSyDe-02HnLQttitghWVnn0rTs3mw6uDuH3U");
   const model = genAI.getGenerativeModel({ model: 'models/gemini-1.5-flash' });
-  const [summary,setSummary] = useState("");
+  const [summary, setSummary] = useState("");
   const [status, setStatus] = useState("idle");
 
-  async function getSummary(){
-    setStatus('loading');
+  // Helper to get file data as ArrayBuffer
+  async function getFileData(fileObj) {
+    return await fileObj.arrayBuffer();
+  }
 
+  async function getSummary() {
+    setStatus('loading');
     try {
+      const fileData = await getFileData(file); // Convert file to ArrayBuffer
       const result = await model.generateContent([
         {
-            inlineData: {
-                data: file.file,
-                mimeType: file.type,
-            },
+          inlineData: {
+            data: fileData,
+            mimeType: file.type,
+          },
         },
         `
-          Summarize the document
-          in one short paragraph (less than 100 words).
-          Use just plain text with no markdowns or html tags
+        Summarize the document
+        in one short paragraph (less than 100 words).
+        Use just plain text with no markdowns or html tags
         `,
       ]);
       setStatus('success');
@@ -33,29 +37,26 @@ function Summary({file}) {
     }
   }
 
-  useEffect(()=>{
-    if(status === 'idle'){
+  useEffect(() => {
+    if (status === 'idle' && file) {
       getSummary();
     }
-  },[status]);
+    // eslint-disable-next-line
+  }, [status, file]);
 
+  return (
+    <section className="summary">
+      {file?.imageUrl && <img src={file.imageUrl} alt="Preview" />}
+      <h2>Summary</h2>
+      {status === 'loading' ? (
+        <Loader />
+      ) : status === 'success' ? (
+        <p>{summary}</p>
+      ) : status === 'error' ? (
+        <p>Error getting the summary</p>
+      ) : null}
+    </section>
+  );
+}
 
-    return (
-      <section className="summary">
-
-        <img src={file.imageUrl} alt="Preview Image" />
-        <h2>Summary</h2>
-        {
-          status === 'loading' ?
-          <Loader /> :
-          status === 'success' ?
-          <p>{summary}</p> :
-          status === 'error' ?
-          <p>Error getting the summary</p> :
-          ''
-        }
-      </section>
-    )
-  }
-  
-  export default Summary
+export default Summary;

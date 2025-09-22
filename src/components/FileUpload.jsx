@@ -1,29 +1,36 @@
-import {Buffer} from 'buffer';
+import { useRef } from 'react';
 
-function FileUpload({setFile}) {
+function FileUpload({ setFile }) {
+  const fileInputRef = useRef(null);
 
-    async function handleFileUpload(event){
-      const fileUpload = await event.target.files[0].arrayBuffer();
-      const file = {
-        type: event.target.files[0].type,
-        file: Buffer.from(fileUpload).toString("base64"),
-        imageUrl: event.target.files[0].type.includes("pdf") ? "/document-icon.png" : URL.createObjectURL(event.target.files[0])
+  function handleFileChange(e) {
+    const fileObj = e.target.files[0];
+    if (fileObj) {
+      // For preview image (optional)
+      let imageUrl = null;
+      if (fileObj.type.startsWith('image/')) {
+        imageUrl = URL.createObjectURL(fileObj);
       }
-      console.log(file);
-      setFile(file);
+      // Pass the actual File object and extra preview URL to parent
+      setFile({
+        file: fileObj,      // The real File object
+        type: fileObj.type, // MIME type
+        imageUrl: imageUrl  // Preview (for images only)
+      });
     }
-
-    return (
-      <section>
-        <h2>Get Started</h2>
-        <input 
-            type="file" 
-            accept=".pdf, .jpg, .jpeg, .png"
-            onChange={handleFileUpload}
-            />
-      </section>
-    )
   }
-  
-  export default FileUpload
-  
+
+  return (
+    <section className="file-upload">
+      <h2>Upload a document</h2>
+      <input 
+        type="file" 
+        onChange={handleFileChange}
+        ref={fileInputRef} 
+        accept=".pdf, .doc, .docx, .txt, .png, .jpg, .jpeg, .webp"
+      />
+    </section>
+  );
+}
+
+export default FileUpload;
